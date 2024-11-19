@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import streamlit
 
 # Load environment variables
 load_dotenv()
