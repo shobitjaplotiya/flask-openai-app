@@ -1,16 +1,16 @@
 from flask import Flask, request, jsonify
-from openai import OpenAI
+import openai
 import os
 from dotenv import load_dotenv
 import streamlit
+
 
 # Load environment variables
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 
-# Initialize OpenAI client
-client = OpenAI(api_key=api_key)
-
+# Set OpenAI API key
+openai.api_key = api_key
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -21,7 +21,8 @@ courses = {}
 # Function to get response from OpenAI
 def get_openai_response(question):
     try:
-        completion = client.chat.completions.create(
+        # Call OpenAI API
+        completion = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an expert course creator"},
@@ -43,8 +44,13 @@ def add_course():
     learner_type = data.get('learner_type')
 
     # Validate input
-    if not course_id or not course_description or not number_of_words.isdigit() or not learner_type:
-        return jsonify({"error": "Invalid input. Provide ID, description, word count, and learner type."}), 400
+    try:
+        number_of_words = int(number_of_words)  # Convert to integer
+    except (ValueError, TypeError):
+        return jsonify({"error": "Invalid input. 'number_of_words' must be an integer."}), 400
+
+    if not course_id or not course_description or not learner_type:
+        return jsonify({"error": "Invalid input. Provide ID, description, and learner type."}), 400
 
     if course_id in courses:
         return jsonify({"error": "Course ID already exists."}), 409
@@ -82,7 +88,7 @@ def update_course(course_id):
     learner_type = data.get('learner_type')
 
     # Validate input
-    if not course_description or not number_of_words.isdigit() or not learner_type:
+    if not course_description or not isinstance(number_of_words, int) or not learner_type:
         return jsonify({"error": "Invalid input. Provide description, word count, and learner type."}), 400
 
     # Generate updated course content using OpenAI
