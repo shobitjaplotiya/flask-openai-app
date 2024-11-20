@@ -114,6 +114,5 @@ def delete_course(course_id):
     return jsonify({"message": "Course deleted successfully.", "course_id": course_id}), 200
 
 # Start the Flask app
-app = Flask(__name__)
-
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
