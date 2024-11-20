@@ -7,14 +7,11 @@ WORKDIR /app
 # Copy the current directory contents into the container
 COPY . .
 
-# Install system dependencies (if needed, e.g., build tools)
-RUN apt-get update && apt-get install -y --no-install-recommends gcc
-
-# Install Python dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port the app will run on
+# Expose the port that Gunicorn will listen on
 EXPOSE 5000
 
-# Command to run the Flask app using Gunicorn for production
+# Command to start the application using Gunicorn
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
